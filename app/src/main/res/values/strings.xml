@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ví QR</string>
+    <string name="splash_title">Ví VietQR</string>
+    <string name="splash_subtitle">Thanh toán an toàn</string>
+    <string name="splash_version">V1.0.0</string>
+
+    <string name="greeting">Chào buổi sáng,</string>
+    <string name="user_name">Tuấn Nguyễn</string>
+    <string name="create_qr_title">Tạo mã VietQR mới</string>
+    <string name="create_qr_desc">Tạo mã thanh toán tức thì với số tiền tùy chỉnh.</string>
+    <string name="create_now">Tạo mới</string>
+    <string name="my_wallet_title">Ví QR của tôi</string>
+    <string name="my_wallet_desc">Quản lý 12 người nhận đã lưu</string>
+    <string name="view_collection">Xem bộ sưu tập</string>
+    <string name="quick_actions">Tác vụ nhanh</string>
+    <string name="action_scan">Quét QR</string>
+    <string name="action_history">Lịch sử</string>
+    <string name="action_share">Chia sẻ App</string>
+    <string name="recent_recipients">Người nhận gần đây</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_scan">Quét mã</string>
+    <string name="nav_wallet">Ví</string>
+    <string name="nav_settings">Cài đặt</string>
+
+    <!-- Settings Strings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="account_security">TÀI KHOẢN &amp; BẢO MẬT</string>
+    <string name="face_id_login">Đăng nhập FaceID</string>
+    <string name="change_pin">Đổi mã PIN</string>
+    <string name="transaction_limits">Hạn mức giao dịch</string>
+    <string name="limit_value">50TR VND</string>
+    <string name="notifications">THÔNG BÁO</string>
+    <string name="push_notifications">Thông báo đẩy</string>
+    <string name="email_alerts">Cảnh báo qua Email</string>
+    <string name="support_info">HỖ TRỢ &amp; THÔNG TIN</string>
+    <string name="help_center">Trung tâm trợ giúp</string>
+    <string name="privacy_policy">Chính sách bảo mật</string>
+    <string name="rate_app">Đánh giá ứng dụng</string>
+    <string name="log_out">Đăng xuất</string>
+    <string name="version_info">VietQR Wallet v1.0.2</string>
+    <string name="theme">GIAO DIỆN</string>
+    <string name="theme_light">Chế độ sáng</string>
+    <string name="theme_dark">Chế độ tối</string>
+    <string name="theme_system">Theo hệ thống</string>
+
+    <!-- Scan Strings -->
+    <string name="scan_hint">Căn mã QR vào khung để quét</string>
+    <string name="import_image">Nhập từ thư viện ảnh</string>
+
+    <!-- Create QR Strings -->
+    <string name="create_qr_header">Tạo mã QR</string>
+    <string name="step_1_bank">1. Chọn ngân hàng</string>
+    <string name="hint_bank">Chọn ngân hàng</string>
+    <string name="step_2_account">2. Thông tin tài khoản</string>
+    <string name="hint_account_number">Số tài khoản</string>
+    <string name="hint_account_name">Tên chủ tài khoản</string>
+    <string name="step_3_details">3. Chi tiết thanh toán</string>
+    <string name="hint_amount">Số tiền (VND)</string>
+    <string name="hint_content">Nội dung / Ghi chú</string>
+    <string name="btn_generate">Tạo mã QR</string>
+</resources>

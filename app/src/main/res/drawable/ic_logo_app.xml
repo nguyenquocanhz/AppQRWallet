@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background Hands Shape -->
+    <path
+        android:fillColor="#F2994A"
+        android:pathData="M30,15 C25,15 15,20 15,30 L15,45 C15,50 20,50 25,45 L30,40 L60,40 C65,40 65,35 60,35 L35,35 L35,25 C35,20 30,15 30,15 Z M78,93 C83,93 93,88 93,78 L93,63 C93,58 88,58 83,63 L78,68 L48,68 C43,68 43,73 48,73 L73,73 L73,83 C73,88 78,93 78,93 Z"/>
+
+    <!-- QR Code Corners -->
+    <path
+        android:fillColor="#F2994A"
+        android:pathData="M30,30 L40,30 L40,35 L30,35 L30,30 Z M78,30 L68,30 L68,35 L78,35 L78,30 Z M30,78 L40,78 L40,73 L30,73 L30,78 Z M78,78 L68,78 L68,73 L78,73 L78,78 Z"/>
+
+    <!-- QR Code Pixels -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M35,35 h10 v10 h-10 z M50,35 h5 v5 h-5 z M60,35 h10 v10 h-10 z M35,50 h5 v5 h-5 z M55,50 h15 v5 h-15 z M35,60 h10 v10 h-10 z M50,60 h5 v5 h-5 z M60,60 h10 v10 h-10 z M47,47 h14 v14 h-14 z"/>
+</vector>
