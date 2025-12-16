@@ -1,21 +1,20 @@
 package com.nqatech.vqr;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.nqatech.vqr.adapter.BankAdapter;
 import com.nqatech.vqr.api.ApiClient;
+import com.nqatech.vqr.api.VietQRRequest;
 import com.nqatech.vqr.api.VietQRService;
 import com.nqatech.vqr.api.model.Bank;
+import com.nqatech.vqr.api.model.GenQRResponse;
 import com.nqatech.vqr.api.model.VietQRResponse;
 import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.Recipient;
@@ -53,6 +52,15 @@ public class CreateQRActivity extends AppCompatActivity {
         etAccountName = findViewById(R.id.etAccountName);
         etAmount = findViewById(R.id.etAmount);
         etContent = findViewById(R.id.etContent);
+        
+        // Add scan icon listener
+        ImageView ivScan = findViewById(R.id.ivScan);
+        if (ivScan != null) {
+            ivScan.setOnClickListener(v -> {
+                // Implement scan functionality later or navigate to ScanActivity
+                Toast.makeText(this, "Tính năng quét đang cập nhật", Toast.LENGTH_SHORT).show();
+            });
+        }
 
         setupBankList();
         setupGenerateButton();
@@ -104,13 +112,65 @@ public class CreateQRActivity extends AppCompatActivity {
             String bin = selectedBank.getBin();
             String bankCode = selectedBank.getCode();
             String bankNameStr = selectedBank.getShortName() + " - " + selectedBank.getName();
+            
+            // Generate QR via API first
+            int amountInt = 0;
+            try {
+                if (!amount.isEmpty()) amountInt = Integer.parseInt(amount);
+            } catch (NumberFormatException e) {}
+            
+            int acqId = 0;
+            try {
+                acqId = Integer.parseInt(bin);
+            } catch (NumberFormatException e) {}
 
-            // Save to Room Database
-            Recipient recipient = new Recipient(bankNameStr, bankCode, bin, accountNumber, accountName, amount, content);
-            AppDatabase.getDatabase(this).recipientDao().insertRecipient(recipient);
+            VietQRRequest request = new VietQRRequest(
+                    accountNumber,
+                    accountName,
+                    acqId,
+                    amountInt,
+                    content,
+                    "text", 
+                    "qr_only" 
+            );
+            
+            Toast.makeText(this, "Đang tạo mã QR...", Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(this, "Đã tạo QR thành công!", Toast.LENGTH_SHORT).show();
-            finish();
+            ApiClient.getService().generateQR(request).enqueue(new Callback<VietQRResponse<GenQRResponse>>() {
+                @Override
+                public void onResponse(Call<VietQRResponse<GenQRResponse>> call, Response<VietQRResponse<GenQRResponse>> response) {
+                    String qrDataURL = null;
+                    if (response.isSuccessful() && response.body() != null) {
+                        VietQRResponse<GenQRResponse> res = response.body();
+                        if ("00".equals(res.getCode()) && res.getData() != null) {
+                            qrDataURL = res.getData().getQrDataURL();
+                        }
+                    }
+                    
+                    // Save to Room Database
+                    Recipient recipient = new Recipient(bankNameStr, bankCode, bin, accountNumber, accountName, amount, content);
+                    if (qrDataURL != null) {
+                        recipient.qrDataURL = qrDataURL;
+                    }
+                    
+                    // Store the logo URL of the selected bank if available
+                    // We assume Recipient entity might need a field for logo or we just use bankCode logic later
+                    // For now, saving basic info.
+                    
+                    AppDatabase.getDatabase(CreateQRActivity.this).recipientDao().insertRecipient(recipient);
+
+                    Toast.makeText(CreateQRActivity.this, "Đã tạo và lưu QR thành công!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onFailure(Call<VietQRResponse<GenQRResponse>> call, Throwable t) {
+                    Toast.makeText(CreateQRActivity.this, "Lỗi kết nối khi tạo QR: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Recipient recipient = new Recipient(bankNameStr, bankCode, bin, accountNumber, accountName, amount, content);
+                    AppDatabase.getDatabase(CreateQRActivity.this).recipientDao().insertRecipient(recipient);
+                    finish();
+                }
+            });
         });
     }
 }

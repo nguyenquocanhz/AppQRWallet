@@ -3,6 +3,8 @@ package com.nqatech.vqr;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -14,12 +16,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.Result;
+import com.google.zxing.common.HybridBinarizer;
 import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.Recipient;
 import com.nqatech.vqr.qr.QRCodeAnalyzer;
 import com.nqatech.vqr.qr.QRScannerHelper;
 import com.nqatech.vqr.theme.ThemeManager;
 import com.nqatech.vqr.util.VietQRParser;
+
+import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -62,40 +72,8 @@ public class ScanQRActivity extends AppCompatActivity {
         qrScannerHelper = new QRScannerHelper(this, previewView, this, new QRCodeAnalyzer.QRCodeListener() {
             @Override
             public void onQRCodeFound(String qrCode) {
-                // Stop camera immediately to avoid multiple detections
                 qrScannerHelper.stopCamera();
-                
-                runOnUiThread(() -> Toast.makeText(ScanQRActivity.this, "Đang xử lý...", Toast.LENGTH_SHORT).show());
-
-                // Process in background thread
-                dbExecutor.execute(() -> {
-                    Recipient recipient = VietQRParser.parse(qrCode);
-                    
-                    if (recipient != null) {
-                        // Insert into Room Database
-                        AppDatabase.getDatabase(ScanQRActivity.this).recipientDao().insertRecipient(recipient);
-                        
-                        // Navigate to Detail Activity
-                        runOnUiThread(() -> {
-                             Intent intent = new Intent(ScanQRActivity.this, QRDetailActivity.class);
-                             intent.putExtra("BANK_NAME", recipient.bankName);
-                             intent.putExtra("BANK_BIN", recipient.bin);
-                             intent.putExtra("ACCOUNT_NUMBER", recipient.accountNumber);
-                             intent.putExtra("ACCOUNT_NAME", recipient.accountName);
-                             intent.putExtra("AMOUNT", recipient.amount);
-                             intent.putExtra("CONTENT", recipient.content);
-                             startActivity(intent);
-                             finish();
-                        });
-                    } else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(ScanQRActivity.this, "Mã QR không hợp lệ hoặc không phải VietQR", Toast.LENGTH_SHORT).show();
-                            // Restart camera if needed or finish
-                            // For better UX, we could delay and restart
-                            qrScannerHelper.startCamera();
-                        });
-                    }
-                });
+                processQRCode(qrCode);
             }
 
             @Override
@@ -104,6 +82,38 @@ public class ScanQRActivity extends AppCompatActivity {
             }
         });
         qrScannerHelper.startCamera();
+    }
+    
+    private void processQRCode(String qrCode) {
+        runOnUiThread(() -> Toast.makeText(ScanQRActivity.this, "Đang xử lý...", Toast.LENGTH_SHORT).show());
+
+        dbExecutor.execute(() -> {
+            Recipient recipient = VietQRParser.parse(qrCode);
+            
+            if (recipient != null) {
+                // Insert into Room Database
+                AppDatabase.getDatabase(ScanQRActivity.this).recipientDao().insertRecipient(recipient);
+                
+                runOnUiThread(() -> {
+                     Intent intent = new Intent(ScanQRActivity.this, QRDetailActivity.class);
+                     intent.putExtra("BANK_NAME", recipient.bankName);
+                     intent.putExtra("BANK_BIN", recipient.bin);
+                     intent.putExtra("ACCOUNT_NUMBER", recipient.accountNumber);
+                     intent.putExtra("ACCOUNT_NAME", recipient.accountName);
+                     intent.putExtra("AMOUNT", recipient.amount);
+                     intent.putExtra("CONTENT", recipient.content);
+                     startActivity(intent);
+                     finish();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(ScanQRActivity.this, "Mã QR không hợp lệ hoặc không phải VietQR", Toast.LENGTH_SHORT).show();
+                    if (qrScannerHelper != null) {
+                        qrScannerHelper.startCamera();
+                    }
+                });
+            }
+        });
     }
     
     @Override
@@ -125,9 +135,40 @@ public class ScanQRActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
-            // In a real app, we would use ML Kit or ZXing to decode the bitmap from Uri
-            Toast.makeText(this, "Chức năng quét ảnh từ thư viện chưa được tích hợp", Toast.LENGTH_SHORT).show();
+            if (selectedImage != null) {
+                decodeQRFromImage(selectedImage);
+            }
         }
+    }
+    
+    private void decodeQRFromImage(Uri uri) {
+        dbExecutor.execute(() -> {
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                
+                if (bitmap == null) {
+                    runOnUiThread(() -> Toast.makeText(this, "Không thể đọc ảnh", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+
+                int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
+                bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+                RGBLuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
+                BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+                
+                MultiFormatReader reader = new MultiFormatReader();
+                Result result = reader.decode(binaryBitmap);
+                
+                String qrContent = result.getText();
+                processQRCode(qrContent);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Không tìm thấy mã QR trong ảnh", Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     @Override

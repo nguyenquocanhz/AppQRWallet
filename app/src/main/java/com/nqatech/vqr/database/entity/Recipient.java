@@ -15,6 +15,7 @@ public class Recipient {
     public String accountName;
     public String amount;
     public String content;
+    public String qrDataURL; // Base64 of the QR image
     public long createdAt;
 
     public Recipient(String bankName, String bankCode, String bin, String accountNumber, String accountName, String amount, String content) {

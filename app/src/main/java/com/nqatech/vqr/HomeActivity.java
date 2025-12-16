@@ -95,6 +95,12 @@ public class HomeActivity extends AppCompatActivity {
         // Setup RecyclerView
         rvRecentRecipients = findViewById(R.id.rvRecentRecipients);
         rvRecentRecipients.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        
+        TextView tvSeeAll = findViewById(R.id.tvSeeAll);
+        tvSeeAll.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, QRListActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

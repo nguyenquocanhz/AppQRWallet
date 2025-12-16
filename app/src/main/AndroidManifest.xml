@@ -67,11 +67,41 @@
             android:exported="false"
             android:theme="@style/Theme.VíQR" />
 
+        <activity
+            android:name=".QRListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        
+        <!-- Widget Provider -->
+        <receiver
+            android:name=".QRWidgetProvider"
+            android:exported="true"
+            android:label="Quét QR Nhanh">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_qr_scan_info" />
+        </receiver>
+        
+        <!-- Quick Settings Tile Service -->
+        <service
+            android:name=".QRScanTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_scan"
+            android:label="Quét Ví QR"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
     </application>

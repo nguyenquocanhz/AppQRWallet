@@ -20,7 +20,6 @@
     
     <!-- Splash Screen Theme -->
     <style name="Theme.VíQR.Splash" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/splash_bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>

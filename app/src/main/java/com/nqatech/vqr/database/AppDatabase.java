@@ -10,7 +10,7 @@ import com.nqatech.vqr.database.dao.UserDao;
 import com.nqatech.vqr.database.entity.Recipient;
 import com.nqatech.vqr.database.entity.User;
 
-@Database(entities = {User.class, Recipient.class}, version = 3, exportSchema = false)
+@Database(entities = {User.class, Recipient.class}, version = 4, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 

@@ -25,7 +25,7 @@
             android:layout_marginTop="32dp"
             android:background="@drawable/bg_circle_button"
             android:padding="10dp"
-            android:src="@drawable/ic_fingerprint"
+            android:src="@drawable/ic_widgets"
             app:tint="@color/text_primary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -79,7 +79,7 @@
             android:layout_marginEnd="20dp"
             android:background="@drawable/bg_action_icon"
             android:padding="8dp"
-            android:src="@drawable/ic_launcher_foreground"
+            android:src="@drawable/ic_notification_alert"
             app:tint="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="@+id/ivAvatar"
             app:layout_constraintEnd_toEndOf="parent"
@@ -128,7 +128,7 @@
                             android:layout_height="48dp"
                             android:background="@drawable/bg_action_icon"
                             android:padding="10dp"
-                            android:src="@drawable/ic_launcher_foreground"
+                            android:src="@drawable/ic_qrcode"
                             app:tint="@color/brand_green" />
 
                         <LinearLayout
@@ -293,6 +293,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvSeeAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/see_all"
