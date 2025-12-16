@@ -1,76 +1,57 @@
-# Ví QR - Trợ lý QR & Thanh toán Cá nhân
+# Ví QR - Ứng dụng Quản lý & Thanh toán QR
 
-**Ví QR** là ứng dụng Android hiện đại giúp người dùng tạo, lưu trữ và quét mã QR ngân hàng (VietQR) nhanh chóng. Được thiết kế theo phong cách Material Design 3, ứng dụng mang đến trải nghiệm mượt mà, tích hợp bảo mật sinh trắc học và các tiện ích truy cập nhanh từ hệ thống.
+**Ví QR** là một ứng dụng Android hiện đại, được thiết kế để đơn giản hóa việc quét mã QR, tạo mã thanh toán và quản lý thông tin tài khoản ngân hàng. Dự án tích hợp nhiều công nghệ tiên tiến như quét NFC, nhận diện sinh trắc học và đồng bộ đám mây.
 
-## ✨ Tính năng Nổi bật
+## 🚀 Tính Năng Chính
 
-*   **⚡ Quét & Tạo QR Thông minh:**
-    *   **Quét QR:** Sử dụng **CameraX** kết hợp **ZXing** để nhận diện mã VietQR/EMVCo cực nhanh. Tự động phân tích thông tin (Ngân hàng, Số tài khoản, Số tiền, Nội dung).
-    *   **Tạo QR:** Kết nối API VietQR để tạo mã chuyển khoản chính xác kèm logo ngân hàng.
-    *   **Lưu trữ:** Tự động lưu lịch sử quét và tạo mã để tra cứu lại dễ dàng.
+*   **Quét QR Code Thông Minh:**
+    *   Sử dụng CameraX và ZXing để quét mã QR nhanh chóng và chính xác.
+    *   Hỗ trợ quét mã VietQR và các loại mã QR thanh toán phổ biến.
+    *   Tích hợp đèn Flash và khả năng quét từ thư viện ảnh.
+*   **Tạo Mã QR Cá Nhân:**
+    *   Dễ dàng tạo mã QR cho tài khoản ngân hàng của bạn (chuẩn VietQR).
+    *   Tùy chỉnh thông tin số tiền và nội dung chuyển khoản.
+*   **Quản Lý Ví & Danh Bạ:**
+    *   Lưu trữ danh sách người thụ hưởng.
+    *   Xem lại lịch sử quét và các mã QR đã tạo.
+*   **Đọc NFC (CCCD/Hộ Chiếu):**
+    *   Tích hợp tính năng đọc thẻ Căn cước công dân gắn chip và Hộ chiếu điện tử qua giao thức NFC (sử dụng thư viện JMRTD).
+*   **Tiện Ích Mở Rộng:**
+    *   **App Widget:** Đưa tính năng quét QR ra ngay màn hình chính.
+    *   **Quick Settings Tile:** Phím tắt trên thanh cài đặt nhanh giúp mở máy quét QR tức thì từ bất kỳ đâu.
+*   **Bảo Mật & Thông Báo:**
+    *   Hỗ trợ đăng nhập và xác thực sinh trắc học (Vân tay/Khuôn mặt).
+    *   Nhận thông báo đẩy (Push Notification) qua Firebase Cloud Messaging.
 
-*   **🛡️ Bảo mật & Riêng tư:**
-    *   **Sinh trắc học:** Đăng nhập an toàn bằng Vân tay hoặc FaceID (Biometric API).
-    *   **Dữ liệu cục bộ:** Thông tin nhạy cảm được lưu trữ an toàn trên thiết bị người dùng.
-
-*   **📱 Tiện ích Hệ thống:**
-    *   **Widget màn hình chính:** Phím tắt giúp mở nhanh trình quét mã ngay từ màn hình chính.
-    *   **Quick Settings Tile:** Tích hợp nút quét QR vào thanh cài đặt nhanh (Quick Settings) của Android.
-    *   **Dark Mode:** Giao diện tự động thích ứng theo chế độ Sáng/Tối của điện thoại.
-
-## 🛠 Tech Stack (Công nghệ)
-
-Dự án được xây dựng trên nền tảng Java với các thư viện Android Jetpack mới nhất:
+## 🛠 Công Nghệ Sử Dụng
 
 *   **Ngôn ngữ:** Java
-*   **Android SDK:** Min 24 (Android 7.0) - Target 36
-*   **Giao diện:** XML Layouts, Material Design 3 Components.
-*   **Kiến trúc:** Mô hình hướng Activity, kết hợp Repository pattern cho xử lý dữ liệu.
+*   **SDK:** Min 24 (Android 7.0), Target 36
+*   **Kiến trúc:** MVVM (đang chuyển đổi) / Activity-based
+*   **Giao diện:** XML Layouts, Material Design 3
+*   **Cơ sở dữ liệu:** Room Database (SQLite)
+*   **Kết nối mạng:** Retrofit, Gson
+*   **Camera & QR:** Android CameraX, ZXing Library
+*   **NFC & Identity:** JMRTD, Scuba (cho việc đọc chip Passport/CCCD)
+*   **Cloud Services:** Google Firebase (Messaging, Analytics)
 
-### Thư viện chính:
-| Thành phần | Thư viện | Mục đích |
-| :--- | :--- | :--- |
-| **Database** | **Room Database** | Quản lý dữ liệu cục bộ (SQLite abstraction). |
-| **Networking** | **Retrofit 2 + Gson** | Gọi API và xử lý dữ liệu JSON. |
-| **Camera** | **CameraX** | Xử lý xem trước và phân tích hình ảnh từ camera. |
-| **QR Core** | **ZXing** | Giải mã hình ảnh QR code. |
-| **Async** | **Executors** | Xử lý tác vụ nền (Background threads). |
-| **Cloud** | **Firebase (FCM)** | Nhận thông báo đẩy từ máy chủ. |
+## 📂 Cấu Trúc Dự Án
 
-## 📂 Cấu trúc Source Code
+*   `ui/`: Chứa các Activity và Fragment (Scan, Home, Settings, NFC...).
+*   `database/`: Các Entity và DAO của Room Database.
+*   `api/`: Cấu hình Retrofit và các Interface gọi API.
+*   `qr/`: Các lớp xử lý logic quét và phân tích mã QR.
+*   `services/`: Các Service chạy nền (FCM, TileService).
 
-```text
-com.nqatech.vqr
-├── adapter/            # RecyclerView Adapters (Hiển thị danh sách)
-├── api/                # Retrofit Client & API Interfaces
-├── database/           # Room Database, DAOs và Entities
-├── qr/                 # Logic xử lý Camera và phân tích mã QR
-├── theme/              # Quản lý giao diện và Theme
-├── util/               # Các lớp tiện ích (ImageLoader, Biometric, Parser...)
-├── [Activities]        # Các màn hình chính (Home, Scan, Create, Detail...)
-├── QRWidgetProvider.java    # Xử lý Widget
-└── QRScanTileService.java   # Xử lý Quick Settings Tile
-```
+## 📦 Cài Đặt
 
-## 🚀 Hướng dẫn Cài đặt
-
-1.  **Clone dự án:**
+1.  Clone repository về máy:
     ```bash
-    git clone https://github.com/nqatech/vqr-android.git
+    git clone https://github.com/your-repo/VQR.git
     ```
-2.  **Cấu hình Firebase:**
-    *   Tải file `google-services.json` từ Firebase Console.
-    *   Copy file vào thư mục `app/` của dự án.
-3.  **Build & Run:**
-    *   Mở dự án bằng **Android Studio**.
-    *   Đợi Gradle sync hoàn tất.
-    *   Nhấn **Run** (Shift + F10) để cài đặt lên thiết bị thật (Khuyến nghị để test Camera và Vân tay).
-
-## 📝 Lưu ý Phát triển
-
-*   Dự án sử dụng Java 11 (cấu hình trong `build.gradle.kts`).
-*   Khi chỉnh sửa Database (`User`, `Recipient`), cần cập nhật version database hoặc migrate phù hợp.
-*   Các key API hoặc thông tin nhạy cảm không nên commit lên git (sử dụng `local.properties` nếu cần).
+2.  Mở dự án bằng **Android Studio**.
+3.  Đồng bộ hóa Gradle (Sync Project with Gradle Files).
+4.  Kết nối thiết bị thật hoặc máy ảo và nhấn **Run**.
 
 ---
 *Dự án được phát triển bởi NQATech.*

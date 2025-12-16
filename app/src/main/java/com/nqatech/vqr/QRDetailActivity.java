@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.nqatech.vqr.api.ApiClient;
 import com.nqatech.vqr.api.VietQRRequest;
 import com.nqatech.vqr.api.model.GenQRResponse;
@@ -46,8 +46,18 @@ public class QRDetailActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_STORAGE = 101;
     private ImageView ivQRCode;
+    private TextView tvAmount, tvContent;
     private int recipientId = -1;
     private Bitmap currentQRBitmap = null;
+    
+    // Hold current data to regenerate
+    private String currentBankBin;
+    private String currentAccountNumber;
+    private String currentAccountName;
+    private String currentAmount;
+    private String currentContent;
+    private String currentBankName;
+    private String currentBankCode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,14 +70,17 @@ public class QRDetailActivity extends AppCompatActivity {
         
         ImageView btnDelete = findViewById(R.id.btnDelete);
         btnDelete.setOnClickListener(v -> showDeleteConfirmation());
+        
+        ImageView btnEdit = findViewById(R.id.btnEdit);
+        btnEdit.setOnClickListener(v -> showEditDialog());
 
         // Binding views
         ivQRCode = findViewById(R.id.ivQRCode);
         TextView tvBankName = findViewById(R.id.tvBankName);
         TextView tvAccountNumber = findViewById(R.id.tvAccountNumber);
         TextView tvAccountName = findViewById(R.id.tvAccountName);
-        TextView tvAmount = findViewById(R.id.tvAmount);
-        TextView tvContent = findViewById(R.id.tvContent);
+        tvAmount = findViewById(R.id.tvAmount);
+        tvContent = findViewById(R.id.tvContent);
         View btnSave = findViewById(R.id.btnSave);
         View btnShare = findViewById(R.id.btnShare);
         
@@ -80,39 +93,89 @@ public class QRDetailActivity extends AppCompatActivity {
             recipientId = intent.getIntExtra("RECIPIENT_ID", -1);
             if (recipientId != -1) {
                 btnDelete.setVisibility(View.VISIBLE);
+                btnEdit.setVisibility(View.VISIBLE);
             }
 
-            String bankName = intent.getStringExtra("BANK_NAME");
-            String bankBin = intent.getStringExtra("BANK_BIN");
-            String accountNumber = intent.getStringExtra("ACCOUNT_NUMBER");
-            String accountName = intent.getStringExtra("ACCOUNT_NAME");
-            String amount = intent.getStringExtra("AMOUNT");
-            String content = intent.getStringExtra("CONTENT");
+            currentBankName = intent.getStringExtra("BANK_NAME");
+            currentBankCode = intent.getStringExtra("BANK_CODE"); // We might need this if we were editing everything, but for now just amount/content
+            currentBankBin = intent.getStringExtra("BANK_BIN");
+            currentAccountNumber = intent.getStringExtra("ACCOUNT_NUMBER");
+            currentAccountName = intent.getStringExtra("ACCOUNT_NAME");
+            currentAmount = intent.getStringExtra("AMOUNT");
+            currentContent = intent.getStringExtra("CONTENT");
 
-            tvBankName.setText(bankName != null ? bankName : "");
-            tvAccountNumber.setText(accountNumber != null ? accountNumber : "");
-            tvAccountName.setText(accountName != null ? accountName : "");
+            tvBankName.setText(currentBankName != null ? currentBankName : "");
+            tvAccountNumber.setText(currentAccountNumber != null ? currentAccountNumber : "");
+            tvAccountName.setText(currentAccountName != null ? currentAccountName : "");
             
-            // Format amount
-            if (amount != null && !amount.isEmpty()) {
-                try {
-                    double amountValue = Double.parseDouble(amount);
-                    DecimalFormat formatter = new DecimalFormat("#,###");
-                    tvAmount.setText(formatter.format(amountValue) + " VND");
-                } catch (NumberFormatException e) {
-                    tvAmount.setText(amount + " VND");
-                }
-            } else {
-                tvAmount.setText("0 VND");
-            }
-            
-            tvContent.setText(content != null ? content : "");
+            updateAmountUI(currentAmount);
+            tvContent.setText(currentContent != null ? currentContent : "");
             
             // Generate QR Image
-            if (bankBin != null && !bankBin.isEmpty() && accountNumber != null && !accountNumber.isEmpty()) {
-                generateVietQR(bankBin, accountNumber, accountName, amount, content);
+            if (currentBankBin != null && !currentBankBin.isEmpty() && currentAccountNumber != null && !currentAccountNumber.isEmpty()) {
+                generateVietQR(currentBankBin, currentAccountNumber, currentAccountName, currentAmount, currentContent, false);
             }
         }
+    }
+    
+    private void updateAmountUI(String amount) {
+        if (amount != null && !amount.isEmpty()) {
+            try {
+                double amountValue = Double.parseDouble(amount);
+                DecimalFormat formatter = new DecimalFormat("#,###");
+                tvAmount.setText(formatter.format(amountValue) + " VND");
+            } catch (NumberFormatException e) {
+                tvAmount.setText(amount + " VND");
+            }
+        } else {
+            tvAmount.setText("0 VND");
+        }
+    }
+    
+    private void showEditDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chỉnh sửa thông tin");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_edit_qr, null);
+        final TextInputEditText inputAmount = viewInflated.findViewById(R.id.etEditAmount);
+        final TextInputEditText inputContent = viewInflated.findViewById(R.id.etEditContent);
+        final TextInputEditText inputCTK = viewInflated.findViewById(R.id.editCTK);
+        // stk
+        final TextInputEditText inputSTK = viewInflated.findViewById(R.id.editSTK);
+
+        inputSTK.setText(currentAccountNumber);
+        inputCTK.setText(currentAccountName);
+        inputAmount.setText(currentAmount);
+        inputContent.setText(currentContent);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton("Cập nhật", (dialog, which) -> {
+            // Update data
+            String newCTK = inputCTK.getText().toString();
+            String newSTK = inputSTK.getText().toString();
+            String newAmount = inputAmount.getText().toString();
+            String newContent = inputContent.getText().toString();
+            
+            updateRecipientInfo(newCTK, newSTK, newAmount, newContent);
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+    
+    private void updateRecipientInfo(String newCTK,String newSTK, String newAmount, String newContent) {
+        currentAccountName = newCTK;
+        currentAccountNumber = newSTK;
+        currentAmount = newAmount;
+        currentContent = newContent;
+        
+        // Update UI
+        updateAmountUI(currentAmount);
+        tvContent.setText(currentContent);
+        
+        // Regenerate QR and Update DB
+        generateVietQR(currentBankBin, currentAccountNumber, currentAccountName, currentAmount, currentContent, true);
     }
     
     private void showDeleteConfirmation() {
@@ -129,14 +192,6 @@ public class QRDetailActivity extends AppCompatActivity {
         
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
-            // Need to fetch the entity first because deleteRecipient takes an object
-            // Or use a query to delete by ID if added to Dao.
-            // Since Dao has delete(Recipient), we construct a dummy recipient with ID or fetch it.
-            // Safer to fetch or add deleteById query.
-            // For now, let's fetch to be safe.
-            // Ideally add @Query("DELETE FROM recipients WHERE id = :id") to Dao.
-            // But I cannot modify Dao easily without re-reading it.
-            // Let's assume Dao delete works on primary key match.
             Recipient recipientToDelete = new Recipient(null, null, null, null, null, null, null);
             recipientToDelete.id = recipientId;
             AppDatabase.getDatabase(this).recipientDao().deleteRecipient(recipientToDelete);
@@ -149,7 +204,7 @@ public class QRDetailActivity extends AppCompatActivity {
         executor.shutdown();
     }
 
-    private void generateVietQR(String bin, String accountNumber, String accountName, String amount, String content) {
+    private void generateVietQR(String bin, String accountNumber, String accountName, String amount, String content, boolean updateDb) {
         int amountInt = 0;
         try {
             if (amount != null && !amount.isEmpty()) {
@@ -174,6 +229,10 @@ public class QRDetailActivity extends AppCompatActivity {
                 "text", 
                 "compact"
         );
+        
+        if (updateDb) {
+            Toast.makeText(this, "Đang cập nhật QR...", Toast.LENGTH_SHORT).show();
+        }
 
         ApiClient.getService().generateQR(request).enqueue(new Callback<VietQRResponse<GenQRResponse>>() {
             @Override
@@ -182,6 +241,8 @@ public class QRDetailActivity extends AppCompatActivity {
                     VietQRResponse<GenQRResponse> vietQRResponse = response.body();
                     if ("00".equals(vietQRResponse.getCode()) && vietQRResponse.getData() != null) {
                         String base64Image = vietQRResponse.getData().getQrDataURL();
+                        String rawBase64 = base64Image; // Keep full string for DB if needed, usually just need data part
+                        
                         if (base64Image != null && base64Image.contains(",")) {
                             base64Image = base64Image.split(",")[1];
                         }
@@ -190,6 +251,10 @@ public class QRDetailActivity extends AppCompatActivity {
                             byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
                             currentQRBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                             ivQRCode.setImageBitmap(currentQRBitmap);
+                            
+                            if (updateDb && recipientId != -1) {
+                                updateDatabase(rawBase64);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -199,8 +264,29 @@ public class QRDetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<VietQRResponse<GenQRResponse>> call, Throwable t) {
+                if (updateDb) {
+                     Toast.makeText(QRDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+    
+    private void updateDatabase(String qrDataURL) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            Recipient recipient = AppDatabase.getDatabase(this).recipientDao().getRecipientById(recipientId);
+            if (recipient != null) {
+                recipient.accountName = currentAccountName;
+                recipient.accountNumber = currentAccountNumber;
+                recipient.amount = currentAmount;
+                recipient.content = currentContent;
+                recipient.qrDataURL = qrDataURL;
+                AppDatabase.getDatabase(this).recipientDao().updateRecipient(recipient);
+                
+                runOnUiThread(() -> Toast.makeText(this, "Đã cập nhật thành công", Toast.LENGTH_SHORT).show());
+            }
+        });
+        executor.shutdown();
     }
 
     private void saveImageToGallery() {
@@ -221,7 +307,6 @@ public class QRDetailActivity extends AppCompatActivity {
         }
 
         saveBitmap(currentQRBitmap);
-        Toast.makeText(this, "Đã lưu ảnh vào thư viện", Toast.LENGTH_SHORT).show();
     }
 
     private void saveBitmap(Bitmap bitmap) {

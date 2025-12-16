@@ -59,6 +59,7 @@ public class QRListActivity extends AppCompatActivity {
                 );
                 item.amount = recipient.amount;
                 item.content = recipient.content;
+                item.qrDataURL = recipient.qrDataURL;
                 items.add(item);
             }
         }

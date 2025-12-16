@@ -187,7 +187,7 @@
                     android:id="@+id/btnCreateQR"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_surface_card"
                     android:gravity="center"
@@ -200,7 +200,7 @@
                         android:layout_height="32dp"
                         android:background="@drawable/bg_action_icon"
                         android:padding="6dp"
-                        android:src="@drawable/ic_launcher_foreground"
+                        android:src="@drawable/ic_create_qr"
                         app:tint="@color/brand_green" />
 
                     <TextView
@@ -209,7 +209,7 @@
                         android:layout_marginTop="8dp"
                         android:text="Tạo mã"
                         android:textColor="@color/text_primary"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
 
@@ -218,7 +218,7 @@
                     android:id="@+id/btnQuickScan"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginHorizontal="4dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_surface_card"
                     android:gravity="center"
@@ -240,15 +240,16 @@
                         android:layout_marginTop="8dp"
                         android:text="@string/action_scan"
                         android:textColor="@color/text_primary"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
 
-                <!-- Action: More -->
+                <!-- Action: NFC Reader -->
                 <LinearLayout
+                    android:id="@+id/btnNfcReader"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginHorizontal="4dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_surface_card"
                     android:gravity="center"
@@ -261,16 +262,47 @@
                         android:layout_height="32dp"
                         android:background="@drawable/bg_action_icon"
                         android:padding="6dp"
-                        android:src="@drawable/ic_widgets"
-                        app:tint="#BB6BD9" />
+                        android:src="@drawable/ic_fingerprint"
+                        app:tint="#2F80ED" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Thêm"
+                        android:text="Quét NFC"
                         android:textColor="@color/text_primary"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                
+                <!-- Action: History -->
+                <LinearLayout
+                    android:id="@+id/btnNotificationHistory"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_surface_card"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingVertical="16dp"
+                    android:elevation="2dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_action_icon"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_history"
+                        app:tint="#E91E63" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Biến động"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>

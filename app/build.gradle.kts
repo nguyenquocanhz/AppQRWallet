@@ -6,14 +6,12 @@ plugins {
 
 android {
     namespace = "com.nqatech.vqr"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.nqatech.vqr"
-        minSdk = 24
-        targetSdk = 36
+        minSdk = 26
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -30,8 +28,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -64,6 +67,11 @@ dependencies {
     // Declare the dependencies for the Firebase Cloud Messaging library
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+    
+    // NFC / JMRTD dependencies
+    implementation("org.jmrtd:jmrtd:0.7.18")
+    implementation("net.sf.scuba:scuba-sc-android:0.0.20")
+    implementation("com.madgag.spongycastle:prov:1.58.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

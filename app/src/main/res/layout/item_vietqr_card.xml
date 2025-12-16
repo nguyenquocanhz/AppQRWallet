@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ivQR"
+        app:layout_constraintEnd_toStartOf="@+id/cardQR"
         android:paddingEnd="12dp">
 
         <ImageView
@@ -80,15 +80,24 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Right side: QR Image -->
-    <ImageView
-        android:id="@+id/ivQR"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardQR"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:background="@android:color/white"
-        android:padding="4dp"
-        android:src="@drawable/ic_qrcode"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <ImageView
+            android:id="@+id/ivQR"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_qrcode" />
+    </androidx.cardview.widget.CardView>
+    
 </androidx.constraintlayout.widget.ConstraintLayout>

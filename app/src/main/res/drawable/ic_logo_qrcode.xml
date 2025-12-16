@@ -1,5 +1,33 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="48dp" android:viewportHeight="960" android:viewportWidth="960" android:width="48dp">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+  
+  <!-- Background Circle (Soft Green/Teal Gradient) -->
+  <path
+      android:pathData="M50,50m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0"
+      android:fillColor="#E0F2F1"/>
       
-    <path android:fillColor="#5985E1" android:pathData="M80,280v-200h200v80L160,160v120L80,280ZM80,880v-200h80v120h120v80L80,880ZM680,880v-80h120v-120h80v200L680,880ZM800,280v-120L680,160v-80h200v200h-80ZM700,700h60v60h-60v-60ZM700,580h60v60h-60v-60ZM640,640h60v60h-60v-60ZM580,700h60v60h-60v-60ZM520,640h60v60h-60v-60ZM640,520h60v60h-60v-60ZM580,580h60v60h-60v-60ZM520,520h60v60h-60v-60ZM760,200v240L520,440v-240h240ZM440,520v240L200,760v-240h240ZM440,200v240L200,440v-240h240ZM380,700v-120L260,580v120h120ZM380,380v-120L260,260v120h120ZM700,380v-120L580,260v120h120Z"/>
-    
+  <!-- Outer Frame of QR (Dark Green) -->
+  <path
+      android:fillColor="#00695C"
+      android:pathData="M25,25h20v20h-20z M30,30v10h10v-10h-10z M55,25h20v20h-20z M60,30v10h10v-10h-10z M25,55h20v20h-20z M30,60v10h10v-10h-10z"/>
+      
+  <!-- Inner QR Data Elements (Dark Green & Orange Accent) -->
+  <path
+      android:fillColor="#00695C"
+      android:pathData="M55,55h10v10h-10z M65,65h10v10h-10z M55,65h5v5h-5z M70,55h5v5h-5z"/>
+      
+  <!-- Center Scan Line / Wallet Symbol (Orange/Amber) -->
+  <path
+      android:fillColor="#FF8F00"
+      android:pathData="M48,20h4v60h-4z"/>
+      
+  <!-- Optional: Wallet Outline overlay or integrated -->
+  <path
+      android:fillColor="#004D40"
+      android:pathData="M35,48h30v4h-30z"
+      android:fillAlpha="0.8"/>
+
 </vector>

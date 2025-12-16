@@ -14,7 +14,7 @@
             android:pathData="M32.074,-0.025H7.901V40.024H32.074V-0.025Z"/>
         <path
             android:pathData="M7.605,-0.568h24.889v40.889h-24.889z"
-            android:fillColor="url(#pattern0_202_8212)"/>
+            android:fillColor="#C5E429"/>
       </group>
     </group>
     <group>
@@ -25,7 +25,7 @@
             android:pathData="M40,15.827H31.679V24.148H40V15.827Z"/>
         <path
             android:pathData="M31.309,15.432h8.889v8.889h-8.889z"
-            android:fillColor="url(#pattern1_202_8212)"/>
+            android:fillColor="#78EF78"/>
       </group>
     </group>
     <group>
@@ -36,7 +36,7 @@
             android:pathData="M8.296,15.827H-0.025V24.148H8.296V15.827Z"/>
         <path
             android:pathData="M-0.099,15.432h8.889v8.889h-8.889z"
-            android:fillColor="url(#pattern2_202_8212)"/>
+            android:fillColor="#38EF4A"/>
       </group>
     </group>
   </group>

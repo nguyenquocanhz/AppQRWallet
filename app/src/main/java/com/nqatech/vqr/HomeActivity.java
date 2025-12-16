@@ -3,6 +3,7 @@ package com.nqatech.vqr;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -73,6 +74,20 @@ public class HomeActivity extends AppCompatActivity {
         btnQuickScan.setOnClickListener(v -> {
              Intent intent = new Intent(HomeActivity.this, ScanQRActivity.class);
              startActivity(intent);
+        });
+        
+        // NFC Reader Utility
+        LinearLayout btnNfcReader = findViewById(R.id.btnNfcReader);
+        btnNfcReader.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, NfcReaderActivity.class);
+            startActivity(intent);
+        });
+        // History Utility
+        LinearLayout btnNotificationHistory = findViewById(R.id.btnNotificationHistory);
+        btnNotificationHistory.setOnClickListener(v ->
+        {
+            Intent intent = new Intent(HomeActivity.this, HistoryActivity.class);
+            startActivity(intent);
         });
 
         // Pinned QR
@@ -177,6 +192,11 @@ public class HomeActivity extends AppCompatActivity {
                 );
                 item.amount = recipient.amount;
                 item.content = recipient.content;
+                item.qrDataURL = recipient.qrDataURL; // Added mapping
+                
+                Log.d("HomeActivity", "Recipient ID: " + recipient.id + ", QR URL Length: " + 
+                     (recipient.qrDataURL != null ? recipient.qrDataURL.length() : "null"));
+                     
                 items.add(item);
             }
         }

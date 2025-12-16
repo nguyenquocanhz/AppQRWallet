@@ -15,6 +15,9 @@ public interface RecipientDao {
     @Query("SELECT * FROM recipients ORDER BY createdAt DESC")
     List<Recipient> getAllRecipients();
 
+    @Query("SELECT * FROM recipients WHERE id = :id")
+    Recipient getRecipientById(int id);
+
     @Insert
     void insertRecipient(Recipient recipient);
 
