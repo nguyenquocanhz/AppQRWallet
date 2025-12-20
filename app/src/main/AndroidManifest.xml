@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
     <!-- Permission to query all packages for App Selection feature -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -15,9 +14,6 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-feature
-        android:name="android.hardware.nfc"
-        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -79,14 +75,14 @@
             android:name=".QRListActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-            
-        <activity
-            android:name=".NfcReaderActivity"
-            android:exported="false"
-            android:theme="@style/Theme.VíQR" />
 
         <activity
             android:name=".HistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VíQR" />
+            
+        <activity
+            android:name=".PinActivity"
             android:exported="false"
             android:theme="@style/Theme.VíQR" />
 

@@ -76,12 +76,6 @@ public class HomeActivity extends AppCompatActivity {
              startActivity(intent);
         });
         
-        // NFC Reader Utility
-        LinearLayout btnNfcReader = findViewById(R.id.btnNfcReader);
-        btnNfcReader.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, NfcReaderActivity.class);
-            startActivity(intent);
-        });
         // History Utility
         LinearLayout btnNotificationHistory = findViewById(R.id.btnNotificationHistory);
         btnNotificationHistory.setOnClickListener(v ->

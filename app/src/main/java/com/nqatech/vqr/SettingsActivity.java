@@ -29,6 +29,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.nqatech.vqr.theme.ThemeManager;
@@ -51,12 +54,19 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextView tvUserName;
     private TextView tvPhone;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        // Configure Google Sign-In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -147,6 +157,10 @@ public class SettingsActivity extends AppCompatActivity {
             layoutBiometric.setVisibility(View.GONE);
         }
 
+        // Logout Button
+        TextView btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> signOut());
+
         // Setup Bottom Nav Interactions
         LinearLayout navHome = findViewById(R.id.navHome);
         navHome.setOnClickListener(v -> {
@@ -160,6 +174,20 @@ public class SettingsActivity extends AppCompatActivity {
         btnScanCenter.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, ScanQRActivity.class);
             startActivity(intent);
+        });
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // Clear login state
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            prefs.edit().putBoolean("is_logged_in", false).apply();
+
+            // Navigate to LoginActivity
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         });
     }
 

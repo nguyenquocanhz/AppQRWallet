@@ -4,70 +4,54 @@ This file serves as a context guide for AI assistants (like Gemini, Copilot) and
 
 ## 1. Project Overview
 *   **Name:** Ví QR (VietQR Wallet)
-*   **Description:** An Android application for managing QR codes, making payments, scanning NFC documents, and storing recipient information.
-*   **Root Path:** `D:/AndroidApp/VQR`
+*   **Description:** An Android application for managing QR codes, making payments, and storing recipient information, secured with Google Sign-In and a PIN.
+*   **Root Path:** `E:/QRWallet/AppQRWallet`
+
+### Key Features
+*   **Secure Login:** Google Sign-In with session management and a 6-digit PIN lock.
+*   **Smart QR Scanning:** Fast QR code scanning using CameraX and ZXing.
+*   **Personal QR Creation:** Generate custom VietQR codes.
+*   **App Widget & Quick Settings Tile:** Quick access to scanning features.
+*   **Biometric Security:** Fingerprint/Face authentication for added convenience and security.
 
 ## 2. Tech Stack & Libraries
 *   **Language:** Java
-*   **Minimum SDK:** 24 (Android 7.0)
-*   **Target SDK:** 36
-*   **UI Toolkit:** XML Layouts with Material Design 3.
-*   **Database:** Room Database (`androidx.room`).
-*   **Network:** Retrofit 2 + Gson.
-*   **Camera & QR:** CameraX (`androidx.camera`) + ZXing (`com.google.zxing`) for scanning and decoding.
-*   **NFC & ID:** JMRTD, Scuba (for reading ePassport/ID Cards).
-*   **Services:** Google Firebase (Messaging, Analytics).
+*   **Security:** Google Sign-In, AndroidX Biometric, AndroidX Security (for EncryptedSharedPreferences).
+*   **Database:** Room Database.
 *   **Build System:** Gradle (Kotlin DSL).
 
 ## 3. Architecture & Structure
-The project currently follows a standard Activity-based structure (transitioning to MVVM where appropriate).
+The project follows an MVVM pattern where applicable.
 
-*   **Activities:**
-    *   `SplashActivity`: Entry point, logo animation.
-    *   `HomeActivity`: Main dashboard with "Create QR", "Wallet", "History", and settings access.
-    *   `ScanQRActivity`: Main camera interface for scanning QR codes (CameraX + ZXing).
-    *   `CreateQRActivity`: Interface for generating personal/bank QR codes.
-    *   `SettingsActivity`: User preferences, Theme toggle, Biometric settings.
-    *   `NfcReaderActivity`: Handles NFC reading for ID cards/Passports.
-    *   `QRDetailActivity`, `AlertActivity`, `LoginActivity`, `QRListActivity`: Auxiliary screens.
-*   **Database (`com.nqatech.vqr.database`):**
-    *   `AppDatabase`: Singleton Room database instance.
-    *   **Entities:** `User`, `Recipient`.
-    *   **DAOs:** `UserDao`, `RecipientDao`.
-*   **API (`com.nqatech.vqr.api`):**
-    *   `ApiClient`: Retrofit instance management.
-    *   `VietQRApiService`: Interfaces for external API calls (e.g., VietQR).
-*   **Helpers:**
-    *   `QRScannerHelper`, `QRCodeAnalyzer`: Logic for QR detection and processing.
-*   **Services:**
-    *   `MyFirebaseMessagingService`: Handles push notifications.
-    *   `QRScanTileService`: Quick Settings tile for fast scanning.
-    *   `QRWidgetProvider`: Home screen widget.
+### Key Components
+*   `SplashActivity`: Entry point, checks login & PIN status.
+*   `LoginActivity`: Handles Google Sign-In flow.
+*   `PinActivity`: Handles PIN creation and verification.
+*   `HomeActivity`: Main dashboard.
+*   `SettingsActivity`: User preferences, profile, and logout.
 
-## 4. Coding Conventions
-*   **Naming:**
-    *   Variables/Methods: `camelCase`
-    *   Classes: `PascalCase`
-    *   Resources (layouts, drawables, ids): `snake_case` (e.g., `activity_home.xml`, `tv_user_name`).
-*   **UI:**
-    *   Prefer `ConstraintLayout` for complex screens.
-    *   Use `strings.xml` for all text content.
-    *   Adhere to Material Design 3 guidelines.
-*   **Database/Network:**
-    *   Always access Room Database via `AppDatabase.getDatabase(context)`.
-    *   Perform DB and Network operations on background threads (Executors/Coroutines).
-*   **Logging:** Use `Log.d(TAG, message)` for debugging.
+## 4. Security Risks & Best Practices (MANDATORY)
+
+*   **CRITICAL - PIN/Sensitive Data Storage:**
+    *   **DO NOT** store PINs, tokens, or any sensitive user data in standard `SharedPreferences` as plaintext. 
+    *   **MUST USE:** `EncryptedSharedPreferences` for storing all sensitive key-value data, including the user's PIN.
+    *   **For relational data:** The Room database should be encrypted using SQLCipher.
+
+*   **Code Obfuscation:**
+    *   For all `release` builds, ProGuard/R8 **must be enabled** (`isMinifyEnabled = true`) in `build.gradle.kts` to obfuscate code and deter reverse engineering.
+
+*   **Secure Screen Content:**
+    *   In any Activity or Fragment that displays sensitive information (e.g., `PinActivity`, `QRDetailActivity`), **MUST USE** `getWindow().setFlags(LayoutParams.FLAG_SECURE, LayoutParams.FLAG_SECURE)` to prevent screenshots and screen recording.
+
+*   **Logging:**
+    *   **DO NOT** log sensitive information (tokens, PINs, user data) in any circumstance. Use a logging library like Timber that automatically strips logs from release builds.
 
 ## 5. Agent Instructions (Prompts)
-*   **When creating a new Activity:**
-    *   Create the Java class extending `AppCompatActivity`.
-    *   Create the corresponding layout file in `res/layout`.
-    *   **Crucial:** Register the activity in `AndroidManifest.xml`.
-*   **When modifying UI:**
-    *   Check `res/values/colors.xml` and `themes.xml` to ensure consistency with the app's theme (Dark Green primary).
-*   **On Error:**
-    *   If an import is missing, check `libs.versions.toml` or `build.gradle.kts` to verify dependencies.
-    *   For Camera/NFC issues, verify permissions in `AndroidManifest.xml`.
+
+*   **Architecture:** Adhere to MVVM for new features.
+*   **Security First:** Before implementing any new feature, first consider its security implications based on the rules in Section 4.
+*   **New Sensitive Screen:** When creating a screen that will handle user secrets, immediately apply the `FLAG_SECURE` window flag.
+*   **Storing Data:** When storing any form of data, first determine its sensitivity. If it is sensitive, use `EncryptedSharedPreferences` or an encrypted database.
 
 ---
-*Last Updated: Active Development Phase*
+*Last Updated: Active Development Phase, v5*

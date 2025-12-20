@@ -1,99 +1,41 @@
 {
   "project_info": {
-    "project_number": "486329191744",
-    "project_id": "fir-auth-9d645",
-    "storage_bucket": "fir-auth-9d645.firebasestorage.app"
+    "project_number": "513646101343",
+    "project_id": "civil-forge-465909-f0",
+    "storage_bucket": "civil-forge-465909-f0.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:486329191744:android:767716d2cdde752bb4fea5",
-        "android_client_info": {
-          "package_name": "com.my.myfirebasedemo"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDKHgWlgOv1ZmQUooCwOWm3scf2_jxFFcs"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:486329191744:android:5b424cad4966c77bb4fea5",
-        "android_client_info": {
-          "package_name": "com.nqatech.FireBaseAuth"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDKHgWlgOv1ZmQUooCwOWm3scf2_jxFFcs"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:486329191744:android:7cf8d861ec467b66b4fea5",
+        "mobilesdk_app_id": "1:513646101343:android:c282b6e311151d9cb32cea",
         "android_client_info": {
           "package_name": "com.nqatech.vqr"
         }
       },
       "oauth_client": [
         {
-          "client_id": "486329191744-ahiaunts7d3fji4f5nctd59esfgmval3.apps.googleusercontent.com",
+          "client_id": "513646101343-109n589tic6u37gi11a1nmv2n2ieu1pj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.nqatech.vqr",
-            "certificate_hash": "58b58a6c523a01bece55e53e5a89c31ef3b7f4d5"
+            "certificate_hash": "1f4678d976b1fb94d5460608d47cf11ca5ebf7cd"
           }
         },
         {
-          "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
+          "client_id": "513646101343-bpc4a5q622ahpr1ggf6f74cc25sqo07s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDKHgWlgOv1ZmQUooCwOWm3scf2_jxFFcs"
+          "current_key": "AIzaSyB5lOg4cBZXTTJ_jLiEiCSSuhdYAkD921M"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "486329191744-fo6ua4akkulvrgil6akubba5hmt75o05.apps.googleusercontent.com",
+              "client_id": "513646101343-bpc4a5q622ahpr1ggf6f74cc25sqo07s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

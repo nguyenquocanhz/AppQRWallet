@@ -28,8 +28,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     packaging {
         resources {
@@ -62,16 +62,14 @@ dependencies {
     // Biometric
     implementation(libs.biometric)
 
+    // Google Sign-In
+    implementation(libs.play.services.auth)
+
     // Firebase (Import the BoM for the Firebase platform)
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
     // Declare the dependencies for the Firebase Cloud Messaging library
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
-    
-    // NFC / JMRTD dependencies
-    implementation("org.jmrtd:jmrtd:0.7.18")
-    implementation("net.sf.scuba:scuba-sc-android:0.0.20")
-    implementation("com.madgag.spongycastle:prov:1.58.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

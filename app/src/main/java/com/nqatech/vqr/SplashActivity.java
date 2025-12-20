@@ -9,33 +9,33 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.nqatech.vqr.theme.ThemeManager;
-import com.nqatech.vqr.util.BiometricUtil;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 2000;
     private static final String PREFS_NAME = "vqr_prefs";
-    private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
+    private static final String KEY_LOGGED_IN = "is_logged_in";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // Apply theme immediately to ensure window background is correct before inflation
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        new Handler(Looper.getMainLooper()).postDelayed(this::checkLoginRequirement, SPLASH_DURATION);
+        new Handler(Looper.getMainLooper()).postDelayed(this::checkLoginStatus, SPLASH_DURATION);
     }
 
-    private void checkLoginRequirement() {
+    private void checkLoginStatus() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean isBiometricEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
+        boolean isLoggedIn = prefs.getBoolean(KEY_LOGGED_IN, false);
 
         Intent intent;
-        if (isBiometricEnabled && BiometricUtil.isBiometricAvailable(this)) {
-            intent = new Intent(SplashActivity.this, LoginActivity.class);
+        if (isLoggedIn) {
+            // If logged in, go to the PIN screen for authentication.
+            intent = new Intent(SplashActivity.this, PinActivity.class);
         } else {
-            intent = new Intent(SplashActivity.this, HomeActivity.class);
+            // If not logged in, go to the Login screen.
+            intent = new Intent(SplashActivity.this, LoginActivity.class);
         }
         
         startActivity(intent);
