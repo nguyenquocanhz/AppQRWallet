@@ -39,7 +39,6 @@ import com.nqatech.vqr.util.BiometricUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,11 +48,11 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "vqr_prefs";
     private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
     private static final String KEY_USER_NAME = "user_name";
-    private static final String KEY_USER_PHONE = "user_phone";
+    private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_TARGET_PACKAGE = "target_bank_package";
 
     private TextView tvUserName;
-    private TextView tvPhone;
+    private TextView tvUserEmail;
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
@@ -72,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         
         tvUserName = findViewById(R.id.tvUserName);
-        tvPhone = findViewById(R.id.tvPhone);
+        tvUserEmail = findViewById(R.id.tvUserEmail);
 
         loadUserInfo();
 
@@ -194,9 +193,9 @@ public class SettingsActivity extends AppCompatActivity {
     private void loadUserInfo() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String name = prefs.getString(KEY_USER_NAME, "Admin");
-        String phone = prefs.getString(KEY_USER_PHONE, "+84 1234567890");
+        String email = prefs.getString(KEY_USER_EMAIL, "");
         tvUserName.setText(name);
-        tvPhone.setText(phone);
+        tvUserEmail.setText(email);
     }
 
     private void showEditProfileDialog() {
@@ -205,21 +204,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null);
         final TextInputEditText inputName = viewInflated.findViewById(R.id.etEditName);
-        final TextInputEditText inputPhone = viewInflated.findViewById(R.id.etEditPhone);
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        inputName.setText(prefs.getString(KEY_USER_NAME, "Nguyen Van A"));
-        inputPhone.setText(prefs.getString(KEY_USER_PHONE, "+84 90 123 4567"));
+        inputName.setText(prefs.getString(KEY_USER_NAME, ""));
 
         builder.setView(viewInflated);
 
         builder.setPositiveButton("Lưu", (dialog, which) -> {
             String newName = inputName.getText().toString();
-            String newPhone = inputPhone.getText().toString();
             
             prefs.edit()
                 .putString(KEY_USER_NAME, newName)
-                .putString(KEY_USER_PHONE, newPhone)
                 .apply();
                 
             loadUserInfo();
@@ -300,11 +295,6 @@ public class SettingsActivity extends AppCompatActivity {
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
         for (ApplicationInfo appInfo : packages) {
-            // Filter out system apps if desired, but some banking apps might be pre-installed?
-            // Usually we want user apps. 
-            // (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0 -> User App
-            // (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0 -> Updated System App (User updated)
-            
             // Let's include everything that has a launch intent (openable apps)
             if (pm.getLaunchIntentForPackage(appInfo.packageName) != null) {
                 String name = pm.getApplicationLabel(appInfo).toString();

@@ -83,13 +83,13 @@
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@+id/ivAvatar"
                     app:layout_constraintTop_toTopOf="@+id/ivAvatar"
-                    app:layout_constraintBottom_toTopOf="@+id/tvPhone"/>
+                    app:layout_constraintBottom_toTopOf="@+id/tvUserEmail"/>
 
                 <TextView
-                    android:id="@+id/tvPhone"
+                    android:id="@+id/tvUserEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+84 90 123 4567"
+                    android:text="example@google.com"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/tvUserName"

@@ -70,6 +70,7 @@ dependencies {
     // Declare the dependencies for the Firebase Cloud Messaging library
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-database") // Added for Realtime Database
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
