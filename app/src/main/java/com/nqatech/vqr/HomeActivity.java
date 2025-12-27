@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nqatech.vqr.adapter.VietQRAdapter;
 import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.Recipient;
@@ -30,6 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     private VietQRAdapter adapter;
     private ImageView ivGreetingIcon;
     private TextView tvGreeting;
+    private TextView tvUserName;
     private TextView tvPinnedBank;
 
     @Override
@@ -41,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
         // Header Views
         ivGreetingIcon = findViewById(R.id.ivGreetingIcon);
         tvGreeting = findViewById(R.id.tvGreeting);
+        tvUserName = findViewById(R.id.tvUserName);
         updateGreeting();
 
         ImageView ivNotification = findViewById(R.id.ivNotification);
@@ -117,19 +121,33 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         loadRecentRecipients();
         loadPinnedQR();
+        updateGreeting(); // Refresh greeting in case of name change
     }
 
     private void updateGreeting() {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
+        String greetingText;
         if (timeOfDay >= 6 && timeOfDay < 18) {
-            tvGreeting.setText("Chào buổi sáng"); // Or Afternoon depending on exact time
+            greetingText = "Chào buổi sáng";
             ivGreetingIcon.setImageResource(R.drawable.ic_sun);
         } else {
-            tvGreeting.setText("Chào buổi tối");
+            greetingText = "Chào buổi tối";
             ivGreetingIcon.setImageResource(R.drawable.ic_moon);
         }
+        tvGreeting.setText(greetingText);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        String displayName = "Admin"; // Default name
+        if (acct != null && acct.getDisplayName() != null && !acct.getDisplayName().isEmpty()) {
+            displayName = acct.getDisplayName();
+        } else {
+            // Fallback to SharedPreferences, which might be set in SettingsActivity
+            SharedPreferences prefs = getSharedPreferences("vqr_prefs", MODE_PRIVATE);
+            displayName = prefs.getString("user_name", "Admin");
+        }
+        tvUserName.setText(displayName);
     }
     
     private void pinRecipient(Recipient recipient) {

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,7 +30,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -53,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextView tvUserName;
     private TextView tvUserEmail;
+    private ImageView ivAvatar;
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
@@ -64,6 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestProfile() // Request profile information for avatar
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
@@ -72,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
         
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
+        ivAvatar = findViewById(R.id.ivAvatar);
 
         loadUserInfo();
 
@@ -196,6 +202,14 @@ public class SettingsActivity extends AppCompatActivity {
         String email = prefs.getString(KEY_USER_EMAIL, "");
         tvUserName.setText(name);
         tvUserEmail.setText(email);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            Uri photoUrl = acct.getPhotoUrl();
+            if (photoUrl != null) {
+                Glide.with(this).load(photoUrl).into(ivAvatar);
+            }
+        }
     }
 
     private void showEditProfileDialog() {
