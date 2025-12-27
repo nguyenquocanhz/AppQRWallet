@@ -1,7 +1,9 @@
 package com.nqatech.vqr;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.nqatech.vqr.adapter.VietQRAdapter;
@@ -28,11 +31,14 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private static final int SELECT_QR_REQUEST_CODE = 1;
+
     private RecyclerView rvRecentRecipients;
     private VietQRAdapter adapter;
     private ImageView ivGreetingIcon;
     private TextView tvGreeting;
     private TextView tvUserName;
+    private ImageView ivAvatar;
     private TextView tvPinnedBank;
 
     @Override
@@ -45,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         ivGreetingIcon = findViewById(R.id.ivGreetingIcon);
         tvGreeting = findViewById(R.id.tvGreeting);
         tvUserName = findViewById(R.id.tvUserName);
+        ivAvatar = findViewById(R.id.ivAvatar);
         updateGreeting();
 
         ImageView ivNotification = findViewById(R.id.ivNotification);
@@ -92,15 +99,9 @@ public class HomeActivity extends AppCompatActivity {
         tvPinnedBank = findViewById(R.id.tvPinnedBank);
         View cardPinnedQR = findViewById(R.id.cardPinnedQR);
         cardPinnedQR.setOnClickListener(v -> {
-             // Logic to pick a pinned QR (e.g., open a dialog or a list)
-             // For now, we simulate picking the first one from recent
-             List<Recipient> list = AppDatabase.getDatabase(this).recipientDao().getAllRecipients();
-             if (list != null && !list.isEmpty()) {
-                 Recipient r = list.get(0);
-                 pinRecipient(r);
-             } else {
-                 Toast.makeText(this, "Chưa có mã QR nào để ghim", Toast.LENGTH_SHORT).show();
-             }
+             Intent intent = new Intent(HomeActivity.this, QRListActivity.class);
+             intent.putExtra("SELECTION_MODE", true);
+             startActivityForResult(intent, SELECT_QR_REQUEST_CODE);
         });
         
         loadPinnedQR();
@@ -124,6 +125,24 @@ public class HomeActivity extends AppCompatActivity {
         updateGreeting(); // Refresh greeting in case of name change
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SELECT_QR_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            int recipientId = data.getIntExtra("SELECTED_RECIPIENT_ID", -1);
+            if (recipientId != -1) {
+                // Inefficient to scan all, but works for now. Better to have getById.
+                List<Recipient> list = AppDatabase.getDatabase(this).recipientDao().getAllRecipients();
+                for (Recipient r : list) {
+                    if (r.id == recipientId) {
+                        pinRecipient(r);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     private void updateGreeting() {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
@@ -140,14 +159,30 @@ public class HomeActivity extends AppCompatActivity {
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         String displayName = "Admin"; // Default name
-        if (acct != null && acct.getDisplayName() != null && !acct.getDisplayName().isEmpty()) {
-            displayName = acct.getDisplayName();
+        Uri photoUrl = null;
+
+        if (acct != null) {
+            if (acct.getDisplayName() != null && !acct.getDisplayName().isEmpty()) {
+                displayName = acct.getDisplayName();
+            }
+            photoUrl = acct.getPhotoUrl();
         } else {
-            // Fallback to SharedPreferences, which might be set in SettingsActivity
+            // Fallback to SharedPreferences if Google account is not available
             SharedPreferences prefs = getSharedPreferences("vqr_prefs", MODE_PRIVATE);
             displayName = prefs.getString("user_name", "Admin");
         }
+        
         tvUserName.setText(displayName);
+
+        if (photoUrl != null) {
+            Glide.with(this)
+                 .load(photoUrl)
+                 .placeholder(R.drawable.ic_widgets) // Default icon
+                 .error(R.drawable.ic_widgets)     // Icon on error
+                 .into(ivAvatar);
+        } else {
+            ivAvatar.setImageResource(R.drawable.ic_widgets);
+        }
     }
     
     private void pinRecipient(Recipient recipient) {
@@ -162,7 +197,7 @@ public class HomeActivity extends AppCompatActivity {
         int pinnedId = prefs.getInt("pinned_qr_id", -1);
         
         if (pinnedId != -1) {
-            // In a real app, query by ID. Here we scan all because we haven't added getById yet
+            // Inefficient scan, should be replaced with a direct DB query
             List<Recipient> list = AppDatabase.getDatabase(this).recipientDao().getAllRecipients();
             for (Recipient r : list) {
                 if (r.id == pinnedId) {
@@ -183,7 +218,13 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         }
+        // If not found or not set, reset the listener to selection mode
         tvPinnedBank.setText("Chạm để chọn mã QR mặc định");
+        findViewById(R.id.cardPinnedQR).setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, QRListActivity.class);
+            intent.putExtra("SELECTION_MODE", true);
+            startActivityForResult(intent, SELECT_QR_REQUEST_CODE);
+        });
     }
 
     private void loadRecentRecipients() {
