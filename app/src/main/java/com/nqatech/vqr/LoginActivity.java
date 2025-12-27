@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void saveLoginState(boolean isLoggedIn, String name, String email) {
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         prefs.edit()
             .putBoolean("is_logged_in", isLoggedIn)
             .putString("user_name", name)

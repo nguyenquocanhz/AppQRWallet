@@ -158,21 +158,21 @@ public class HomeActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to stored name if Google account is not immediately available
-            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+            SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
             tvUserName.setText(prefs.getString("user_name", "User"));
             ivAvatar.setImageResource(R.drawable.ic_widgets);
         }
     }
     
     private void pinRecipientById(int recipientId) {
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         prefs.edit().putInt("pinned_qr_id", recipientId).apply();
         loadPinnedQR(); // Reload to show the newly pinned QR
         Toast.makeText(this, "Đã ghim mã QR mặc định", Toast.LENGTH_SHORT).show();
     }
     
     private void loadPinnedQR() {
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         int pinnedId = prefs.getInt("pinned_qr_id", -1);
         View cardPinnedQR = findViewById(R.id.cardPinnedQR);
 

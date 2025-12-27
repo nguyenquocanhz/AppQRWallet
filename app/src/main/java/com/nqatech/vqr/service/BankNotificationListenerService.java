@@ -19,7 +19,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.nqatech.vqr.HomeActivity;
 import com.nqatech.vqr.R;
-import com.nqatech.vqr.SecurePrefsManager;
+import com.nqatech.vqr.SecurityUtils;
 import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.NotificationHistory;
 import com.nqatech.vqr.service.parser.BankParserFactory;
@@ -94,7 +94,7 @@ public class BankNotificationListenerService extends NotificationListenerService
         // Ignore own notifications to prevent loop
         if (packageName.equals(getPackageName())) return;
 
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         String targetPackage = prefs.getString(KEY_TARGET_PACKAGE, "");
 
         // If no target is set, do nothing.

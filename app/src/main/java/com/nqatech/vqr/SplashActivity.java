@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void checkLoginAndProceed() {
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         boolean isLoggedIn = prefs.getBoolean(KEY_LOGGED_IN, false);
         boolean isBiometricEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
 

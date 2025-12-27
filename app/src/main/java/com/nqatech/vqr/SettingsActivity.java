@@ -132,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (BiometricUtil.isBiometricAvailable(this)) {
             layoutBiometric.setVisibility(View.VISIBLE);
 
-            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+            SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
             boolean isEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
             switchBiometric.setChecked(isEnabled);
 
@@ -184,7 +184,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void signOut() {
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             // Clear login state
-            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+            SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
             prefs.edit().putBoolean("is_logged_in", false).apply();
 
             // Navigate to LoginActivity
@@ -212,7 +212,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to SharedPreferences if Google account is not available
-            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+            SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
             tvUserName.setText(prefs.getString(KEY_USER_NAME, "User"));
             tvUserEmail.setText(prefs.getString(KEY_USER_EMAIL, ""));
             ivAvatar.setImageResource(R.drawable.ic_widgets);
@@ -276,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveSelectedApp(AppInfo appInfo) {
-        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        SharedPreferences prefs = SecurityUtils.getEncryptedSharedPreferences(this);
         prefs.edit().putString(KEY_TARGET_PACKAGE, appInfo.packageName).apply();
         Toast.makeText(this, "Đã chọn: " + appInfo.name, Toast.LENGTH_SHORT).show();
     }
