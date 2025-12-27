@@ -4,54 +4,59 @@ This file serves as a context guide for AI assistants (like Gemini, Copilot) and
 
 ## 1. Project Overview
 *   **Name:** Ví QR (VietQR Wallet)
-*   **Description:** An Android application for managing QR codes, making payments, and storing recipient information, secured with Google Sign-In and a PIN.
-*   **Root Path:** `E:/QRWallet/AppQRWallet`
+*   **Description:** An Android application for managing QR codes, making payments, and storing recipient information, secured with Google Passkey and biometric authentication.
+*   **Root Path:** `E:/BOT01/AppQRWallet`
 
 ### Key Features
-*   **Secure Login:** Google Sign-In with session management and a 6-digit PIN lock.
+*   **Modern Secure Login:**
+    *   Login with Google **Passkey** via Android's Credential Manager.
+    *   Fallback to traditional Google Sign-In.
+*   **Biometric App Lock:** App is secured using Fingerprint/Face ID for quick and secure access after initial login.
 *   **Smart QR Scanning:** Fast QR code scanning using CameraX and ZXing.
 *   **Personal QR Creation:** Generate custom VietQR codes.
-*   **App Widget & Quick Settings Tile:** Quick access to scanning features.
-*   **Biometric Security:** Fingerprint/Face authentication for added convenience and security.
+*   **Dynamic User Profile:** Fetches and displays user's Google account name and avatar.
 
 ## 2. Tech Stack & Libraries
 *   **Language:** Java
-*   **Security:** Google Sign-In, AndroidX Biometric, AndroidX Security (for EncryptedSharedPreferences).
+*   **Authentication:** AndroidX Credential Manager, Google Identity Services (for Passkey and Google Sign-In), AndroidX Biometric.
 *   **Database:** Room Database.
 *   **Build System:** Gradle (Kotlin DSL).
+*   **UI:** XML Layouts, Material Design 3.
+*   **Image Loading:** Glide.
 
 ## 3. Architecture & Structure
-The project follows an MVVM pattern where applicable.
+The project follows an MVVM pattern where applicable, with a focus on modern Android practices.
 
 ### Key Components
-*   `SplashActivity`: Entry point, checks login & PIN status.
-*   `LoginActivity`: Handles Google Sign-In flow.
-*   `PinActivity`: Handles PIN creation and verification.
-*   `HomeActivity`: Main dashboard.
-*   `SettingsActivity`: User preferences, profile, and logout.
+*   `SplashActivity`: Entry point. Checks login status and prompts for biometric authentication if logged in.
+*   `LoginActivity`: Handles user authentication using the **Credential Manager API**.
+*   `HomeActivity`: Main dashboard, displaying user info, pinned QR, and recent QR codes.
+*   `SettingsActivity`: User preferences, profile management, and logout.
 
-## 4. Security Risks & Best Practices (MANDATORY)
+## 4. Development Workflow & Rules (MANDATORY)
 
-*   **CRITICAL - PIN/Sensitive Data Storage:**
-    *   **DO NOT** store PINs, tokens, or any sensitive user data in standard `SharedPreferences` as plaintext. 
-    *   **MUST USE:** `EncryptedSharedPreferences` for storing all sensitive key-value data, including the user's PIN.
-    *   **For relational data:** The Room database should be encrypted using SQLCipher.
+This section contains critical rules that all agents and developers **must** follow.
 
-*   **Code Obfuscation:**
-    *   For all `release` builds, ProGuard/R8 **must be enabled** (`isMinifyEnabled = true`) in `build.gradle.kts` to obfuscate code and deter reverse engineering.
+### Rule 1: Dependency Management
+*   **ACTION:** When introducing code that uses a new external library or a new component from an existing library family (e.g., `androidx.credentials`, `com.google.android.material`), you **must immediately** check the `app/build.gradle.kts` file.
+*   **VERIFY:** Ensure the necessary `implementation` or `annotationProcessor` lines are present.
+*   **ADD/UPDATE:** If the dependency is missing, add it before concluding the task. This prevents build errors.
 
+### Rule 2: Security Best Practices
+*   **Data Storage:**
+    *   **DO NOT** store sensitive data (tokens, API keys, personal info) in standard `SharedPreferences` as plaintext.
+    *   **MUST USE:** `EncryptedSharedPreferences` for all sensitive key-value data.
 *   **Secure Screen Content:**
-    *   In any Activity or Fragment that displays sensitive information (e.g., `PinActivity`, `QRDetailActivity`), **MUST USE** `getWindow().setFlags(LayoutParams.FLAG_SECURE, LayoutParams.FLAG_SECURE)` to prevent screenshots and screen recording.
-
+    *   In any Activity or Fragment displaying sensitive information, **MUST USE** `getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)` to prevent screenshots and screen recording.
 *   **Logging:**
-    *   **DO NOT** log sensitive information (tokens, PINs, user data) in any circumstance. Use a logging library like Timber that automatically strips logs from release builds.
+    *   **DO NOT** log sensitive information in release builds. Use a logging library like Timber or implement checks to ensure logs are stripped.
+*   **Code Obfuscation:**
+    *   For all `release` builds, ProGuard/R8 **must be enabled** (`isMinifyEnabled = true`) to obfuscate code.
 
-## 5. Agent Instructions (Prompts)
-
-*   **Architecture:** Adhere to MVVM for new features.
-*   **Security First:** Before implementing any new feature, first consider its security implications based on the rules in Section 4.
-*   **New Sensitive Screen:** When creating a screen that will handle user secrets, immediately apply the `FLAG_SECURE` window flag.
-*   **Storing Data:** When storing any form of data, first determine its sensitivity. If it is sensitive, use `EncryptedSharedPreferences` or an encrypted database.
+## 5. General Instructions
+*   **Architecture:** Adhere to the existing patterns. Prefer modern Android practices (e.g., using official AndroidX libraries).
+*   **User Experience:** Keep the UI clean, responsive, and consistent with Material Design.
+*   **Code Style:** Maintain consistency with the existing Java code style.
 
 ---
-*Last Updated: Active Development Phase, v5*
+*Last Updated to reflect Passkey/Biometric authentication flow and include dependency management rules.*
