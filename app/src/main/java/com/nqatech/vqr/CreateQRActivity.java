@@ -22,7 +22,6 @@ import com.nqatech.vqr.api.VietQRService;
 import com.nqatech.vqr.api.model.Bank;
 import com.nqatech.vqr.api.model.GenQRResponse;
 import com.nqatech.vqr.api.model.VietQRResponse;
-import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.Recipient;
 import com.nqatech.vqr.theme.ThemeManager;
 import com.nqatech.vqr.utils.CurrencyUtils;
@@ -43,6 +42,7 @@ public class CreateQRActivity extends AppCompatActivity {
     private TextInputEditText etContent;
     private TextInputEditText etSearchBank;
     private ChipGroup chipGroupTemplate;
+    private QrFirestoreRepository qrFirestoreRepository;
     
     private List<Bank> originalBankList = new ArrayList<>();
     private List<Bank> displayedBankList = new ArrayList<>();
@@ -54,6 +54,8 @@ public class CreateQRActivity extends AppCompatActivity {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_qr);
+
+        qrFirestoreRepository = QrFirestoreRepository.getInstance(this);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -289,7 +291,7 @@ public class CreateQRActivity extends AppCompatActivity {
                         recipient.qrDataURL = qrDataURL;
                     }
                     
-                    AppDatabase.getDatabase(CreateQRActivity.this).recipientDao().insertRecipient(recipient);
+                    qrFirestoreRepository.saveRecipient(recipient);
 
                     Toast.makeText(CreateQRActivity.this, "Đã tạo và lưu QR thành công!", Toast.LENGTH_SHORT).show();
                     finish();
@@ -299,7 +301,7 @@ public class CreateQRActivity extends AppCompatActivity {
                 public void onFailure(Call<VietQRResponse<GenQRResponse>> call, Throwable t) {
                     Toast.makeText(CreateQRActivity.this, "Lỗi kết nối khi tạo QR: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     Recipient recipient = new Recipient(bankNameStr, bankCode, bin, accountNumber, accountName, finalAmountStr, content);
-                    AppDatabase.getDatabase(CreateQRActivity.this).recipientDao().insertRecipient(recipient);
+                    qrFirestoreRepository.saveRecipient(recipient);
                     finish();
                 }
             });

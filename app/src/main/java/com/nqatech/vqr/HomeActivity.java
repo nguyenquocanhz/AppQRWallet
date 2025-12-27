@@ -41,6 +41,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvUserName;
     private ImageView ivAvatar;
     private TextView tvPinnedBank;
+    private QrFirestoreRepository qrFirestoreRepository;
 
     private final ActivityResultLauncher<Intent> selectQrLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -58,6 +59,9 @@ public class HomeActivity extends AppCompatActivity {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        qrFirestoreRepository = QrFirestoreRepository.getInstance(this);
+        qrFirestoreRepository.syncRecipientsFromFirestore();
 
         // Header Views
         ivGreetingIcon = findViewById(R.id.ivGreetingIcon);
