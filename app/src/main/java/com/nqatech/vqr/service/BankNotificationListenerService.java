@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.nqatech.vqr.HomeActivity;
 import com.nqatech.vqr.R;
+import com.nqatech.vqr.SecurePrefsManager;
 import com.nqatech.vqr.database.AppDatabase;
 import com.nqatech.vqr.database.entity.NotificationHistory;
 import com.nqatech.vqr.service.parser.BankParserFactory;
@@ -31,7 +32,6 @@ public class BankNotificationListenerService extends NotificationListenerService
 
     private static final String TAG = "BankNotifListener";
     private TextToSpeech tts;
-    private static final String PREFS_NAME = "vqr_prefs";
     private static final String KEY_TARGET_PACKAGE = "target_bank_package";
     private static final String CHANNEL_ID = "vqr_balance_channel";
     private static final String CHANNEL_NAME = "Biến động số dư";
@@ -94,18 +94,19 @@ public class BankNotificationListenerService extends NotificationListenerService
         // Ignore own notifications to prevent loop
         if (packageName.equals(getPackageName())) return;
 
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String targetPackage = prefs.getString(KEY_TARGET_PACKAGE, ""); 
-        
-        boolean isTarget = false;
-        if (targetPackage.isEmpty()) {
-            if (isCommonBank(packageName)) isTarget = true;
-        } else {
-            // Support partial match or exact match
-            if (packageName.toLowerCase().contains(targetPackage.toLowerCase())) isTarget = true;
-        }
+        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
+        String targetPackage = prefs.getString(KEY_TARGET_PACKAGE, "");
 
-        if (!isTarget) return;
+        // If no target is set, do nothing.
+        if (targetPackage.isEmpty()) {
+            Log.w(TAG, "Target bank package not set. Ignoring notification.");
+            return;
+        }
+        
+        // Only process notifications from the selected package.
+        if (!packageName.equalsIgnoreCase(targetPackage)) {
+            return;
+        }
 
         Notification notification = sbn.getNotification();
         if (notification == null) return;
@@ -121,19 +122,8 @@ public class BankNotificationListenerService extends NotificationListenerService
         processNotification(packageName, title, text);
     }
 
-    private boolean isCommonBank(String packageName) {
-        String pkg = packageName.toLowerCase();
-        return pkg.contains("com.vietcombank") || 
-               pkg.contains("com.vcb") || 
-               pkg.contains("com.mbmobile") ||
-               pkg.contains("com.techcombank") ||
-               pkg.contains("vn.com.vietinbank") ||
-               pkg.contains("com.vnpay") ||
-               pkg.contains("com.bidv.smartbanking");
-    }
-
     private void processNotification(String packageName, String title, String content) {
-        // Sử dụng Factory để lấy Parser phù hợp
+        // Use the Factory to get the appropriate Parser
         IBankParser parser = BankParserFactory.getParser(packageName);
         
         double amount = parser.parseAmount(title, content);

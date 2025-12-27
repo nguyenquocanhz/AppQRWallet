@@ -12,8 +12,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +48,7 @@ import retrofit2.Response;
 public class QRDetailActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_STORAGE = 101;
+    private static final String TAG = "QRDetailActivity";
     private ImageView ivQRCode;
     private TextView tvAmount, tvContent;
     private int recipientId = -1;
@@ -63,6 +67,7 @@ public class QRDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_qr_detail);
 
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -97,7 +102,7 @@ public class QRDetailActivity extends AppCompatActivity {
             }
 
             currentBankName = intent.getStringExtra("BANK_NAME");
-            currentBankCode = intent.getStringExtra("BANK_CODE"); // We might need this if we were editing everything, but for now just amount/content
+            currentBankCode = intent.getStringExtra("BANK_CODE");
             currentBankBin = intent.getStringExtra("BANK_BIN");
             currentAccountNumber = intent.getStringExtra("ACCOUNT_NUMBER");
             currentAccountName = intent.getStringExtra("ACCOUNT_NAME");
@@ -114,7 +119,14 @@ public class QRDetailActivity extends AppCompatActivity {
             // Generate QR Image
             if (currentBankBin != null && !currentBankBin.isEmpty() && currentAccountNumber != null && !currentAccountNumber.isEmpty()) {
                 generateVietQR(currentBankBin, currentAccountNumber, currentAccountName, currentAmount, currentContent, false);
+            } else {
+                Toast.makeText(this, "Lỗi: Dữ liệu QR không hợp lệ.", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Missing required data to generate QR. BIN: " + currentBankBin + ", AccountNumber: " + currentAccountNumber);
             }
+        } else {
+            Toast.makeText(this, "Lỗi: Không nhận được dữ liệu.", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Intent is null, cannot display QR details.");
+            finish();
         }
     }
     

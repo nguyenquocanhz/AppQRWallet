@@ -16,8 +16,8 @@ import com.nqatech.vqr.util.BiometricUtil;
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 1500; // Shorter duration
-    private static final String PREFS_NAME = "vqr_prefs";
     private static final String KEY_LOGGED_IN = "is_logged_in";
+    private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,16 +29,16 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void checkLoginAndProceed() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
         boolean isLoggedIn = prefs.getBoolean(KEY_LOGGED_IN, false);
+        boolean isBiometricEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
 
         if (isLoggedIn) {
-            // If logged in, check for biometric availability and prompt if needed
-            if (BiometricUtil.isBiometricAvailable(this)) {
+            // If logged in, check for biometric availability and user preference
+            if (isBiometricEnabled && BiometricUtil.isBiometricAvailable(this)) {
                 showBiometricPromptToUnlock();
             } else {
-                // If no biometrics on device, go straight to home.
-                // This is a security tradeoff: allows access on non-biometric devices without a PIN.
+                // If biometric is not enabled or not available, go to home.
                 navigateToHome();
             }
         } else {

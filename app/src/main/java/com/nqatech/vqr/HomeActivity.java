@@ -158,21 +158,21 @@ public class HomeActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to stored name if Google account is not immediately available
-            SharedPreferences prefs = getSharedPreferences("vqr_prefs", MODE_PRIVATE);
+            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
             tvUserName.setText(prefs.getString("user_name", "User"));
             ivAvatar.setImageResource(R.drawable.ic_widgets);
         }
     }
     
     private void pinRecipientById(int recipientId) {
-        SharedPreferences prefs = getSharedPreferences("vqr_prefs", MODE_PRIVATE);
+        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
         prefs.edit().putInt("pinned_qr_id", recipientId).apply();
         loadPinnedQR(); // Reload to show the newly pinned QR
         Toast.makeText(this, "Đã ghim mã QR mặc định", Toast.LENGTH_SHORT).show();
     }
     
     private void loadPinnedQR() {
-        SharedPreferences prefs = getSharedPreferences("vqr_prefs", MODE_PRIVATE);
+        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
         int pinnedId = prefs.getInt("pinned_qr_id", -1);
         View cardPinnedQR = findViewById(R.id.cardPinnedQR);
 
@@ -184,7 +184,13 @@ public class HomeActivity extends AppCompatActivity {
                 cardPinnedQR.setOnClickListener(v -> {
                     Intent intent = new Intent(HomeActivity.this, QRDetailActivity.class);
                     intent.putExtra("RECIPIENT_ID", r.id);
-                    // ... (pass other details as before)
+                    intent.putExtra("BANK_NAME", r.bankName);
+                    intent.putExtra("BANK_CODE", r.bankCode);
+                    intent.putExtra("BANK_BIN", r.bin);
+                    intent.putExtra("ACCOUNT_NUMBER", r.accountNumber);
+                    intent.putExtra("ACCOUNT_NAME", r.accountName);
+                    intent.putExtra("AMOUNT", r.amount);
+                    intent.putExtra("CONTENT", r.content);
                     startActivity(intent);
                 });
                 return;
@@ -230,7 +236,13 @@ public class HomeActivity extends AppCompatActivity {
         adapter = new VietQRAdapter(items, item -> {
             Intent intent = new Intent(HomeActivity.this, QRDetailActivity.class);
             intent.putExtra("RECIPIENT_ID", item.id);
-            // ... (pass other details as before)
+            intent.putExtra("BANK_NAME", item.bankName);
+            intent.putExtra("BANK_CODE", item.bankCode);
+            intent.putExtra("BANK_BIN", item.bin);
+            intent.putExtra("ACCOUNT_NUMBER", item.accountNumber);
+            intent.putExtra("ACCOUNT_NAME", item.accountName);
+            intent.putExtra("AMOUNT", item.amount);
+            intent.putExtra("CONTENT", item.content);
             startActivity(intent);
         });
         rvRecentRecipients.setAdapter(adapter);

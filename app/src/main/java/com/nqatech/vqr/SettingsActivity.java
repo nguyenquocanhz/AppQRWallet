@@ -48,7 +48,6 @@ import java.util.concurrent.Executors;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String PREFS_NAME = "vqr_prefs";
     private static final String KEY_BIOMETRIC_ENABLED = "biometric_enabled";
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_EMAIL = "user_email";
@@ -133,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (BiometricUtil.isBiometricAvailable(this)) {
             layoutBiometric.setVisibility(View.VISIBLE);
 
-            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
             boolean isEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
             switchBiometric.setChecked(isEnabled);
 
@@ -185,7 +184,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void signOut() {
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             // Clear login state
-            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
             prefs.edit().putBoolean("is_logged_in", false).apply();
 
             // Navigate to LoginActivity
@@ -213,7 +212,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to SharedPreferences if Google account is not available
-            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
             tvUserName.setText(prefs.getString(KEY_USER_NAME, "User"));
             tvUserEmail.setText(prefs.getString(KEY_USER_EMAIL, ""));
             ivAvatar.setImageResource(R.drawable.ic_widgets);
@@ -277,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveSelectedApp(AppInfo appInfo) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = SecurePrefsManager.getEncryptedSharedPreferences(this);
         prefs.edit().putString(KEY_TARGET_PACKAGE, appInfo.packageName).apply();
         Toast.makeText(this, "Đã chọn: " + appInfo.name, Toast.LENGTH_SHORT).show();
     }
