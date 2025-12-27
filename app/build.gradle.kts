@@ -62,11 +62,8 @@ dependencies {
     // Biometric
     implementation(libs.biometric)
 
-    // Google Sign-In & Passkey
+    // Google Sign-In
     implementation(libs.play.services.auth)
-    implementation("androidx.credentials:credentials:1.3.0-alpha02")
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0-alpha02")
-
 
     // Firebase (Import the BoM for the Firebase platform)
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))

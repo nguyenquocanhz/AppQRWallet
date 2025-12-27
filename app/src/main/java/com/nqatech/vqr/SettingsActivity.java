@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -36,7 +37,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.android.material.textfield.TextInputEditText;
 import com.nqatech.vqr.theme.ThemeManager;
 import com.nqatech.vqr.util.BiometricUtil;
 
@@ -65,26 +65,26 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Configure Google Sign-In
+        // Configure Google Sign-In to request profile info
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestProfile() // Request profile information for avatar
+                .requestProfile() // Required to get the photo URL
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
-        
+
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         ivAvatar = findViewById(R.id.ivAvatar);
 
         loadUserInfo();
 
-        // Setup Edit Profile Button
+        // Hide the Edit Profile Button as it's no longer used
         ImageView btnEditProfile = findViewById(R.id.btnEditProfile);
-        btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
-        
+        btnEditProfile.setVisibility(View.GONE);
+
         // Setup Notification Settings
         LinearLayout btnNotificationPermission = findViewById(R.id.btnNotificationPermission);
         if (btnNotificationPermission != null) {
@@ -97,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
         }
-        
+
         LinearLayout btnConfigBankPackage = findViewById(R.id.btnConfigBankPackage);
         if (btnConfigBankPackage != null) {
             btnConfigBankPackage.setOnClickListener(v -> showAppSelectionDialog());
@@ -106,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Setup Theme RadioGroup
         RadioGroup rgTheme = findViewById(R.id.rgTheme);
         String currentMode = ThemeManager.getCurrentTheme(this);
-        
+
         if (ThemeManager.MODE_LIGHT.equals(currentMode)) {
             rgTheme.check(R.id.rbLight);
         } else if (ThemeManager.MODE_DARK.equals(currentMode)) {
@@ -114,7 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             rgTheme.check(R.id.rbSystem);
         }
-        
+
         rgTheme.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbLight) {
                 ThemeManager.setTheme(SettingsActivity.this, ThemeManager.MODE_LIGHT);
@@ -129,14 +129,14 @@ public class SettingsActivity extends AppCompatActivity {
         // Biometric Settings
         LinearLayout layoutBiometric = findViewById(R.id.layoutBiometric);
         SwitchMaterial switchBiometric = findViewById(R.id.switchBiometric);
-        
+
         if (BiometricUtil.isBiometricAvailable(this)) {
             layoutBiometric.setVisibility(View.VISIBLE);
-            
+
             SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
             boolean isEnabled = prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false);
             switchBiometric.setChecked(isEnabled);
-            
+
             switchBiometric.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     // Require authentication to enable
@@ -197,49 +197,29 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void loadUserInfo() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String name = prefs.getString(KEY_USER_NAME, "Admin");
-        String email = prefs.getString(KEY_USER_EMAIL, "");
-        tvUserName.setText(name);
-        tvUserEmail.setText(email);
-
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
+            tvUserName.setText(acct.getDisplayName());
+            tvUserEmail.setText(acct.getEmail());
+
             Uri photoUrl = acct.getPhotoUrl();
             if (photoUrl != null) {
-                Glide.with(this).load(photoUrl).into(ivAvatar);
+                Glide.with(this).load(photoUrl)
+                    .placeholder(R.drawable.ic_widgets) // Default placeholder
+                    .error(R.drawable.ic_widgets) // Image on error
+                    .into(ivAvatar);
+            } else {
+                ivAvatar.setImageResource(R.drawable.ic_widgets);
             }
+        } else {
+            // Fallback to SharedPreferences if Google account is not available
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            tvUserName.setText(prefs.getString(KEY_USER_NAME, "User"));
+            tvUserEmail.setText(prefs.getString(KEY_USER_EMAIL, ""));
+            ivAvatar.setImageResource(R.drawable.ic_widgets);
         }
     }
 
-    private void showEditProfileDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Chỉnh sửa thông tin");
-
-        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null);
-        final TextInputEditText inputName = viewInflated.findViewById(R.id.etEditName);
-
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        inputName.setText(prefs.getString(KEY_USER_NAME, ""));
-
-        builder.setView(viewInflated);
-
-        builder.setPositiveButton("Lưu", (dialog, which) -> {
-            String newName = inputName.getText().toString();
-            
-            prefs.edit()
-                .putString(KEY_USER_NAME, newName)
-                .apply();
-                
-            loadUserInfo();
-            Toast.makeText(SettingsActivity.this, "Đã cập nhật thông tin", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-
-        builder.show();
-    }
-    
     private void showAppSelectionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Chọn App Ngân Hàng");
@@ -248,28 +228,28 @@ public class SettingsActivity extends AppCompatActivity {
         EditText etSearchApp = viewInflated.findViewById(R.id.etSearchApp);
         ProgressBar progressBar = viewInflated.findViewById(R.id.progressBar);
         RecyclerView rvAppList = viewInflated.findViewById(R.id.rvAppList);
-        
+
         rvAppList.setLayoutManager(new LinearLayoutManager(this));
-        
+
         final AlertDialog dialog = builder.setView(viewInflated).create();
-        
+
         // Show dialog first
         dialog.show();
-        
+
         // Start loading apps in background
         progressBar.setVisibility(View.VISIBLE);
         rvAppList.setVisibility(View.GONE);
-        
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-        
+
         executor.execute(() -> {
             List<AppInfo> appList = getInstalledApps();
-            
+
             handler.post(() -> {
                 progressBar.setVisibility(View.GONE);
                 rvAppList.setVisibility(View.VISIBLE);
-                
+
                 if (appList.isEmpty()) {
                     Toast.makeText(SettingsActivity.this, "Không tìm thấy ứng dụng nào", Toast.LENGTH_SHORT).show();
                 } else {
@@ -279,7 +259,7 @@ public class SettingsActivity extends AppCompatActivity {
                         dialog.dismiss();
                     });
                     rvAppList.setAdapter(adapter);
-                    
+
                     // Setup Search
                     etSearchApp.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -316,10 +296,10 @@ public class SettingsActivity extends AppCompatActivity {
                 apps.add(new AppInfo(name, appInfo.packageName, icon));
             }
         }
-        
+
         // Sort alphabetically
         Collections.sort(apps, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
-        
+
         return apps;
     }
 
@@ -359,7 +339,7 @@ public class SettingsActivity extends AppCompatActivity {
             } else {
                 String lowerQuery = query.toLowerCase();
                 for (AppInfo app : originalList) {
-                    if (app.name.toLowerCase().contains(lowerQuery) || 
+                    if (app.name.toLowerCase().contains(lowerQuery) ||
                         app.packageName.toLowerCase().contains(lowerQuery)) {
                         displayedList.add(app);
                     }
@@ -381,7 +361,7 @@ public class SettingsActivity extends AppCompatActivity {
             holder.tvAppName.setText(app.name);
             holder.tvPackageName.setText(app.packageName);
             holder.ivAppIcon.setImageDrawable(app.icon);
-            
+
             holder.itemView.setOnClickListener(v -> listener.onAppSelected(app));
         }
 

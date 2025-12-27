@@ -9,17 +9,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricPrompt;
-import androidx.core.content.ContextCompat;
 
 import com.nqatech.vqr.theme.ThemeManager;
 import com.nqatech.vqr.util.BiometricUtil;
 
-import java.util.concurrent.Executor;
-
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DURATION = 1500; // Reduced duration
+    private static final int SPLASH_DURATION = 1500; // Shorter duration
     private static final String PREFS_NAME = "vqr_prefs";
     private static final String KEY_LOGGED_IN = "is_logged_in";
 
@@ -41,8 +37,8 @@ public class SplashActivity extends AppCompatActivity {
             if (BiometricUtil.isBiometricAvailable(this)) {
                 showBiometricPromptToUnlock();
             } else {
-                // If no biometrics, go straight to home. 
-                // Consider if this is the desired behavior for non-biometric devices.
+                // If no biometrics on device, go straight to home.
+                // This is a security tradeoff: allows access on non-biometric devices without a PIN.
                 navigateToHome();
             }
         } else {
@@ -53,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void showBiometricPromptToUnlock() {
         BiometricUtil.showBiometricPrompt(this,
-                "Xác thực để mở khóa Ví QR",
+                "Xác thực để mở Ví QR",
                 "Sử dụng vân tay hoặc Face ID của bạn",
                 new BiometricUtil.BiometricCallback() {
                     @Override
@@ -63,7 +59,7 @@ public class SplashActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(String error) {
-                        // User might cancel. Close the app or show a message.
+                        // If user cancels or fails, close the app for security.
                         Toast.makeText(SplashActivity.this, "Xác thực thất bại: " + error, Toast.LENGTH_SHORT).show();
                         finish(); // Close app if authentication fails
                     }

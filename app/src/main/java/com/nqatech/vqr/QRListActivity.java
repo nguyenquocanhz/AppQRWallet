@@ -1,5 +1,6 @@
 package com.nqatech.vqr;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -18,12 +19,16 @@ public class QRListActivity extends AppCompatActivity {
 
     private RecyclerView rvQRList;
     private VietQRAdapter adapter;
+    private boolean isSelectionMode = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_list);
+
+        // Check if started in selection mode
+        isSelectionMode = getIntent().getBooleanExtra("SELECTION_MODE", false);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -65,15 +70,24 @@ public class QRListActivity extends AppCompatActivity {
         }
 
         adapter = new VietQRAdapter(items, item -> {
-            Intent intent = new Intent(QRListActivity.this, QRDetailActivity.class);
-            intent.putExtra("RECIPIENT_ID", item.id);
-            intent.putExtra("BANK_NAME", item.bankName);
-            intent.putExtra("BANK_BIN", item.bin);
-            intent.putExtra("ACCOUNT_NUMBER", item.accountNumber);
-            intent.putExtra("ACCOUNT_NAME", item.accountName);
-            intent.putExtra("AMOUNT", item.amount);
-            intent.putExtra("CONTENT", item.content);
-            startActivity(intent);
+            if (isSelectionMode) {
+                // In selection mode, return the ID to the calling activity
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("SELECTED_RECIPIENT_ID", item.id);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            } else {
+                // In normal mode, open the detail view
+                Intent intent = new Intent(QRListActivity.this, QRDetailActivity.class);
+                intent.putExtra("RECIPIENT_ID", item.id);
+                intent.putExtra("BANK_NAME", item.bankName);
+                intent.putExtra("BANK_BIN", item.bin);
+                intent.putExtra("ACCOUNT_NUMBER", item.accountNumber);
+                intent.putExtra("ACCOUNT_NAME", item.accountName);
+                intent.putExtra("AMOUNT", item.amount);
+                intent.putExtra("CONTENT", item.content);
+                startActivity(intent);
+            }
         });
         rvQRList.setAdapter(adapter);
     }
